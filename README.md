@@ -10,7 +10,8 @@
                                                         \/_/ 
 
 **MillPrep** eats random geodata and poops shapefiles, SQLite databases, or 
-GeoTiffs that have been optimized for rendering with [TileMill][].
+GeoTiffs that have been optimized for rendering with [TileMill][]. It is being
+actively developed and **mostly doesn't work yet**.
 
 It requires the commandline utilities `ogr2ogr` and `shapeindex` to be 
 available.
