@@ -1,5 +1,5 @@
 #!/usr/bin/python2
-# vim: set tabwidth=2 shiftwidth=2 softabstop=2:
+# vim: set tabstop=2 shiftwidth=2 softabstop=2:
 '''
 
                   ___    ___    ____                         
@@ -36,7 +36,7 @@ gmerc_bounds = "-180.0 -85.05112877980659 180 85.05112877980659"
 ################################################################################
 # REPROJECT VECTOR DATASOURCES
 #
-def vector_reproject(src_file, dst_file, output_format='shp', clip=True):
+def vector_reproject(src_file, dst_file, output_format='shp', clip=True, append=None):
 
   ## Set up the command-line options for ogr2ogr
   ogr_cmd = [ 'ogr2ogr' ]
@@ -44,10 +44,12 @@ def vector_reproject(src_file, dst_file, output_format='shp', clip=True):
     ogr_cmd.append('-f "SQLite"')
   else:
     ogr_cmd.append('-f "ESRI Shapefile"')
-  ogr_cmd.append('-s_srs EPSG:4326')
   ogr_cmd.append('-t_srs ' + gmerc_proj4)
   if (clip):
     ogr_cmd.append('-clipsrc ' + gmerc_bounds)
+  if (append):
+    ogr_cmd.append('-update -append')
+    ogr_cmd.append('-nln ' + append)
   ogr_cmd.append('"' + dst_file + '"')
   ogr_cmd.append('"' + src_file + '"')
 
@@ -88,7 +90,16 @@ def vector_process(src_files, dst_dir, output_format='shp', clip=True):
 # MERGE VECTORS INTO A SINGLE FILE
 #
 def vector_merge(src_files, dst_merged, output_format='shp', clip=True):
-  # TODO
+
+  append_layer = path.splitext(path.basename(dst_merged))[0]
+  
+  for src_file in src_files:
+    vector_reproject(src_file, dst_merged, output_format, clip, append_layer)
+
+  # create a Mapnik index for the shapefile, if we made a shapefile
+  if (output_format == 'shp'):
+    subprocess.call(['shapeindex', dst_file])
+
   return True
 
 
@@ -133,7 +144,7 @@ def main():
   if (args.dst_merged):
     if (args.dst_dir):
       print("WARNING: --merge overrides -d. Output directory ignored.")
-    vector_merge(args.src_files, args.dst_merged, args.output_format, args.clip)
+    vector_merge(args.src_files, args.dst_merged[0], args.output_format, args.clip)
 
   # ---- send files to be processed individually -------------------------------
   #
