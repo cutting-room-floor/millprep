@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/env python
 # vim: set tabstop=2 shiftwidth=2 softabstop=2:
 '''
 
