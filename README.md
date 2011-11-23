@@ -18,35 +18,65 @@ available.
 
 [TileMill]: http://tilemill.com
 
-## Goals (TODO):
+## TileMill optimization means:
 
-- don't care about input filetypes
-- default output format is Shapefiles for vector and GeoTiff for raster
-- optionally output vector sources to SQLite
-- clip any data that falls outside the TMS zoom-level 0 tile
-- reproject all sources to The One And Only Google Mercator
-- index output files in a way that speeds up Mapnik rendering
-- if many input files are specified, process them all individually by default
-- optionally merge many input files to a single output file
+- reproject everything to The One And Only Google Mercator
+- clip any data that falls outside the TMS zoom-level 0 tile (this is optional)
+- index output files appropriately for Mapnik
 
-## Examples for a theoretical future working version
+In addition to these core optimizations, MillPrep also allows you to merge many
+input files into a single output file. This is useful for data with a single
+data schema that is distributed as many separate files, such as the U.S. 
+Census Bureau's [TIGER][] shapefiles which are split up by state.
+
+[TIGER]: http://www.census.gov/geo/www/tiger/
+
+## Future Goals:
+
+- appropriately handle any input that the OGR/GDAL supports (the current extent
+  of this is untested)
+- related to above: handle raster input/output
+- test everything in something other than ideal situations
+- possibly: geometry simplification
+
+## Usage
+
+<pre>
+usage: millprep.py [-h] [--sqlite] [--noclip] [-d OUTPUT_DIR] [-m MERGED_FILE]
+                   INPUT_FILE [INPUT_FILE ...]
+
+Convert geographic datasources to more TileMill-optimized formats.
+
+positional arguments:
+  INPUT_FILE            A geographic file to optimize for TileMill
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --sqlite              Use SQLite as the output file format instead of the
+                        default, ESRI Shapefile
+  --noclip              By default files will be clipped so they don't expand
+                        outside the bounds of the Google Mercator square.
+  -d OUTPUT_DIR         Destination directory to output the processed files.
+                        If not specified, output files will be kept in the
+                        same directory as their respective input files.
+  -m MERGED_FILE, --merge MERGED_FILE
+                        Merge all input files into this single output file.
+</pre>
+
+## Examples
 
 The simplest case: reproject & shapeindex a single file. Output file would be
-named `someshape_millready.shp`.
+named `someshape_millready.shp`:
 
     millprep.py someshape.shp
 
-Similar to above, but with a custom output filename:
-
-    millprep.py someshape.shp -o custom_outfile_name.shp
-
 Bulk process a number of files at once. Output filenames will be like
-`<original_name>_millready.shp`
+`<original_name>_millready.shp`:
 
     millprep.py *.shp
 
 Bulk process a number of files at once and put the results in a specified 
-directory. Files keep their original name and *not* have `_millready` appended.
+directory:
 
     millprep.py *.shp -d ./processed/
 
@@ -57,4 +87,8 @@ Merge a number of input files into a single output file.
 Convert a number of shapefiles to individual SQLite files.
 
     millprep.py --sqlite *.shp
+
+Merge a number of shapefiles to a single table of an SQLite file.
+
+    millprep.py --sqlite --merge merged_file.sqlite *.shp
 
