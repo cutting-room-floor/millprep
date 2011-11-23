@@ -82,7 +82,7 @@ directory:
 
 Merge a number of input files into a single output file.
 
-    millprep.py --merge county_*.shp -o all_counties.shp
+    millprep.py --merge all_counties.shp county_*.shp
 
 Convert a number of shapefiles to individual SQLite files.
 
