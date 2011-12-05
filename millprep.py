@@ -1,5 +1,5 @@
 #!/usr/bin/python2
-# vim: set tabstop=2 shiftwidth=2 softabstop=2:
+# vim: set tabstop=2 shiftwidth=2 softtabstop=2:
 '''
 
                   ___    ___    ____                         
@@ -98,7 +98,7 @@ def vector_merge(src_files, dst_merged, output_format='shp', clip=True):
 
   # create a Mapnik index for the shapefile, if we made a shapefile
   if (output_format == 'shp'):
-    subprocess.call(['shapeindex', dst_file])
+    subprocess.call(['shapeindex', dst_merged])
 
   return True
 
